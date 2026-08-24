@@ -2,12 +2,12 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
+COPY order_service ./order_service
 RUN pip install --no-cache-dir uv \
-    && uv pip install --system -r pyproject.toml \
+    && uv pip install --system . \
     && pip uninstall --yes uv
 
-COPY order_service ./order_service
 COPY alembic ./alembic
 COPY alembic.ini ./
 COPY bin ./bin

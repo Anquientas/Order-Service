@@ -39,7 +39,9 @@ class SqlAlchemyOrderRepository:
                 await self._session.flush()
         except IntegrityError as exception:
             assert order.idempotency_key is not None
-            raise DuplicateIdempotencyKey(order.idempotency_key) from exception
+            raise DuplicateIdempotencyKey(
+                order.idempotency_key
+            ) from exception
         return _to_domain(model)
 
     async def get(self, order_id: str) -> Order | None:
@@ -47,6 +49,8 @@ class SqlAlchemyOrderRepository:
         return _to_domain(row) if row else None
 
     async def get_by_idempotency_key(self, key: str) -> Order | None:
-        statement = select(OrderModel).where(OrderModel.idempotency_key == key)
+        statement = select(OrderModel).where(
+            OrderModel.idempotency_key == key
+        )
         row = (await self._session.execute(statement)).scalar_one_or_none()
         return _to_domain(row) if row else None

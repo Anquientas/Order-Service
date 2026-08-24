@@ -7,7 +7,7 @@ class OrderNotFound(Exception):
 class DuplicateIdempotencyKey(Exception):
     def __init__(self, idempotency_key: str) -> None:
         super().__init__(
-            f"Order with idempotency_key {idempotency_key!r} already exists"
+            f'Order with idempotency_key {idempotency_key!r} already exists'
         )
         self.idempotency_key = idempotency_key
 

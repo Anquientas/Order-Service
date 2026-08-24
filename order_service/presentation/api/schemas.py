@@ -2,6 +2,8 @@ import datetime
 
 from pydantic import BaseModel, Field
 
+from order_service.constants.payment import PaymentStatus
+
 
 class CreateOrderRequest(BaseModel):
     user_id: str
@@ -18,3 +20,11 @@ class OrderResponse(BaseModel):
     status: str
     created_at: datetime.datetime
     update_at: datetime.datetime
+
+
+class PaymentCallbackRequest(BaseModel):
+    payment_id: str
+    order_id: str
+    status: PaymentStatus
+    amount: str
+    error_message: str | None = None

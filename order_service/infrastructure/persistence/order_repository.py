@@ -2,7 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from order_service.domain.entities import Order, OrderStatus
+from order_service.constants.order import OrderStatus
+from order_service.domain.entities import Order
 from order_service.domain.exceptions import DuplicateIdempotencyKey
 from order_service.infrastructure.persistence.models import OrderModel
 
@@ -15,6 +16,7 @@ def _to_domain(row: OrderModel) -> Order:
         quantity=row.quantity,
         status=OrderStatus(row.status),
         idempotency_key=row.idempotency_key,
+        payment_id=row.payment_id,
         created_at=row.created_at,
         updated_at=row.updated_at,
     )
@@ -32,6 +34,7 @@ class SqlAlchemyOrderRepository:
             quantity=order.quantity,
             status=order.status,
             idempotency_key=order.idempotency_key,
+            payment_id=order.payment_id,
         )
         try:
             async with self._session.begin_nested():
@@ -54,3 +57,13 @@ class SqlAlchemyOrderRepository:
         )
         row = (await self._session.execute(statement)).scalar_one_or_none()
         return _to_domain(row) if row else None
+
+    async def update_status(self, order_id: str, status: OrderStatus) -> None:
+        model = await self._session.get(OrderModel, order_id)
+        if model is not None:
+            model.status = status
+
+    async def set_payment_id(self, order_id: str, payment_id: str) -> None:
+        model = await self._session.get(OrderModel, order_id)
+        if model is not None:
+            model.payment_id = payment_id

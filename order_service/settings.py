@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     CAPASHINO_BASE_URL: str
     CAPASHINO_API_KEY: SecretStr
 
+    ORDER_SERVICE_CALLBACK_BASE_URL: str
+
     KAFKA_BOOTSTRAP_SERVERS: str = ''
 
     @property

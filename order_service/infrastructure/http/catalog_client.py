@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import httpx
 
 from order_service.domain.entities import CatalogItem
@@ -43,4 +45,5 @@ class HttpCatalogClient:
         return CatalogItem(
             id=data['id'],
             available_qty=data['available_qty'],
+            price=Decimal(data['price']),
         )

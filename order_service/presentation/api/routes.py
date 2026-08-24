@@ -3,6 +3,9 @@ from order_service.application.usecases.create_order import (
     CreateOrderUsecase,
 )
 from order_service.application.usecases.get_order import GetOrderUsecase
+from order_service.application.usecases.process_payment_callback import (
+    ProcessPaymentCallbackUsecase,
+)
 from order_service.domain.entities import Order
 from order_service.domain.exceptions import (
     CatalogServiceUnavailable,
@@ -13,10 +16,12 @@ from order_service.domain.exceptions import (
 from order_service.presentation.api.dependencies import (
     get_create_order_usecase,
     get_get_order_usecase,
+    get_process_payment_callback_usecase,
 )
 from order_service.presentation.api.schemas import (
     CreateOrderRequest,
     OrderResponse,
+    PaymentCallbackRequest,
 )
 
 router = APIRouter(prefix='/api/orders', tags=['orders'])
@@ -73,3 +78,18 @@ async def get_order(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception)
         ) from exception
     return _to_response(order)
+
+
+@router.post('/payment-callback', status_code=status.HTTP_200_OK)
+async def payment_callback(
+    payload: PaymentCallbackRequest,
+    usecase: ProcessPaymentCallbackUsecase = Depends(
+        get_process_payment_callback_usecase
+    ),
+) -> dict[str, str]:
+    await usecase.execute(
+        order_id=payload.order_id,
+        payment_id=payload.payment_id,
+        status=payload.status,
+    )
+    return {'status': 'ok'}

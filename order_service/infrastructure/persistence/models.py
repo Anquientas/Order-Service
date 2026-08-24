@@ -21,6 +21,7 @@ class OrderModel(Base):
     idempotency_key: Mapped[str | None] = mapped_column(
         String(128), nullable=True, unique=True
     )
+    payment_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow
     )

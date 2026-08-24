@@ -4,6 +4,14 @@ class OrderNotFound(Exception):
         self.order_id = order_id
 
 
+class DuplicateIdempotencyKey(Exception):
+    def __init__(self, idempotency_key: str) -> None:
+        super().__init__(
+            f"Order with idempotency_key {idempotency_key!r} already exists"
+        )
+        self.idempotency_key = idempotency_key
+
+
 class ItemNotFound(Exception):
     def __init__(self, item_id: str) -> None:
         super().__init__(f'Item {item_id!r} not found in catalog')

@@ -3,7 +3,11 @@ import uuid
 from order_service.application.ports.catalog_client import CatalogClient
 from order_service.application.ports.unit_of_work import UnitOfWork
 from order_service.domain.entities import Order, OrderStatus
-from order_service.domain.exceptions import InsufficientStock, ItemNotFound
+from order_service.domain.exceptions import (
+    DuplicateIdempotencyKey,
+    InsufficientStock,
+    ItemNotFound,
+)
 
 
 class CreateOrderUsecase:
@@ -21,7 +25,7 @@ class CreateOrderUsecase:
         async with self._uow:
             if idempotency_key:
                 existing = await self._uow.orders.get_by_idempotency_key(
-                    idempotency_key=idempotency_key
+                    idempotency_key
                 )
                 if existing is not None:
                     return existing
@@ -44,6 +48,15 @@ class CreateOrderUsecase:
                 status=OrderStatus.new,
                 idempotency_key=idempotency_key,
             )
-            await self._uow.orders.add(order)
+            try:
+                order = await self._uow.orders.add(order)
+            except DuplicateIdempotencyKey:
+                assert idempotency_key is not None
+                winner = await self._uow.orders.get_by_idempotency_key(
+                    idempotency_key
+                )
+                if winner is None:
+                    raise
+                return winner
             await self._uow.commit()
             return order

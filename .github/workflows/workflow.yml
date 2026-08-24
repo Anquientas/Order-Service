@@ -18,6 +18,7 @@ jobs:
       POSTGRES_PORT: "5432"
       CAPASHINO_BASE_URL: localhost
       CAPASHINO_API_KEY: key
+      ORDER_SERVICE_CALLBACK_BASE_URL: localhost
     steps:
       - uses: actions/checkout@v4
 

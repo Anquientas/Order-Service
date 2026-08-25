@@ -2,10 +2,10 @@ from enum import StrEnum
 
 
 class NotificationMessage(StrEnum):
-    order_new = 'Ваш заказ создан и ожидает оплаты'
-    order_paid = 'Ваш заказ успешно оплачен и готов к отправке'
-    order_shipped = 'Ваш заказ отправлен в доставку'
-    order_cancelled = 'Ваш заказ отменен. Причина: {reason}'
+    order_new = '[NEW] Ваш заказ создан и ожидает оплаты'
+    order_paid = '[PAID] Ваш заказ успешно оплачен и готов к отправке'
+    order_shipped = '[SHIPPED] Ваш заказ отправлен в доставку'
+    order_cancelled = '[CANCELLED] Ваш заказ отменен. Причина: {reason}'
 
 
 class NotificationIdempotencyKey(StrEnum):

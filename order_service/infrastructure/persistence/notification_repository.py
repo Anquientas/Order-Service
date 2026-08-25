@@ -42,9 +42,7 @@ class SqlAlchemyNotificationOutboxRepository:
         except IntegrityError:
             pass
 
-    async def get_pending(
-        self, limit: int
-    ) -> list[NotificationOutboxRecord]:
+    async def get_pending(self, limit: int) -> list[NotificationOutboxRecord]:
         statement = (
             select(NotificationOutboxModel)
             .where(NotificationOutboxModel.status == OutboxStatus.pending)

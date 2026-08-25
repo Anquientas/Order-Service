@@ -33,9 +33,7 @@ class ProcessShipmentEventUsecase:
                     OrderStatus.shipped,
                     OrderStatus.cancelled,
                 ):
-                    await self._uow.orders.update_status(
-                        order_id, new_status
-                    )
+                    await self._uow.orders.update_status(order_id, new_status)
                     await self._enqueue_notification(
                         order_id, new_status, reason
                     )

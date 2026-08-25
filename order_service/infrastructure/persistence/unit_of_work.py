@@ -28,8 +28,8 @@ class SqlAlchemyUnitOfWork:
         self.orders = SqlAlchemyOrderRepository(self._session)
         self.outbox = SqlAlchemyOutboxRepository(self._session)
         self.inbox = SqlAlchemyInboxRepository(self._session)
-        self.notification_outbox = (
-            SqlAlchemyNotificationOutboxRepository(self._session)
+        self.notification_outbox = SqlAlchemyNotificationOutboxRepository(
+            self._session
         )
         return self
 

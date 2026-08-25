@@ -44,3 +44,15 @@ class OutboxRecord:
     error: str | None = None
     created_at: datetime.datetime | None = None
     changed_at: datetime.datetime | None = None
+
+
+@dataclass(slots=True)
+class NotificationOutboxRecord:
+    id: str
+    message: str
+    reference_id: str
+    status: OutboxStatus = OutboxStatus.pending
+    attempts_number: int = 0
+    error: str | None = None
+    created_at: datetime.datetime | None = None
+    changed_at: datetime.datetime | None = None

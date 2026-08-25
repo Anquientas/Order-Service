@@ -4,8 +4,13 @@ from decimal import Decimal
 from order_service.application.ports.catalog_client import CatalogClient
 from order_service.application.ports.payments_client import PaymentsClient
 from order_service.application.ports.unit_of_work import UnitOfWork
+from order_service.constants.notification import (
+    DefaultCancellationReason,
+    NotificationIdempotencyKey,
+    NotificationMessage,
+)
 from order_service.constants.order import OrderStatus
-from order_service.domain.entities import Order
+from order_service.domain.entities import NotificationOutboxRecord, Order
 from order_service.domain.exceptions import (
     DuplicateIdempotencyKey,
     InsufficientStock,
@@ -82,9 +87,29 @@ class CreateOrderUsecase:
                 await self._uow.orders.update_status(
                     order.id, OrderStatus.cancelled
                 )
+                await self._uow.notification_outbox.enqueue(
+                    NotificationOutboxRecord(
+                        id=NotificationIdempotencyKey.order_cancelled.format(
+                            order_id=order.id
+                        ),
+                        message=NotificationMessage.order_cancelled.format(
+                            reason=DefaultCancellationReason.payment_not_created
+                        ),
+                        reference_id=order.id,
+                    )
+                )
             else:
                 order.payment_id = payment.id
                 await self._uow.orders.set_payment_id(order.id, payment.id)
+                await self._uow.notification_outbox.enqueue(
+                    NotificationOutboxRecord(
+                        id=NotificationIdempotencyKey.order_new.format(
+                            order_id=order.id
+                        ),
+                        message=NotificationMessage.order_new,
+                        reference_id=order.id,
+                    )
+                )
 
             await self._uow.commit()
             return order

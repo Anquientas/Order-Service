@@ -60,6 +60,7 @@ class ShipmentEventsConsumer:
                 offset=message.offset,
                 event_type=data.get('event_type'),
                 order_id=data.get('order_id'),
+                reason=data.get('reason'),
             )
         except Exception:
             logger.exception(

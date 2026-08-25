@@ -91,5 +91,6 @@ async def payment_callback(
         order_id=payload.order_id,
         payment_id=payload.payment_id,
         status=payload.status,
+        error_message=payload.error_message,
     )
     return {'status': 'ok'}

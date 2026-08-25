@@ -29,6 +29,20 @@ class CapashinoSettings(BaseModel):
         return self.api_key.get_secret_value()
 
 
+class KafkaSettings(BaseModel):
+    bootstrap_servers: str
+    consumer_group_id: str
+    outbox_attempts_max: int
+    outbox_batch_limit: int
+    outbox_dispatch_interval_seconds: float
+
+
+class NotificationSettings(BaseModel):
+    outbox_attempts_max: int
+    outbox_batch_limit: int
+    outbox_dispatch_interval_seconds: float
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', extra='ignore')
 
@@ -46,9 +60,13 @@ class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: str
     KAFKA_CONSUMER_GROUP_ID: str = 'order-service'
 
-    OUTBOX_MAX_ATTEMPTS: int = 5
-    OUTBOX_BATCH_LIMIT: int = 50
-    OUTBOX_DISPATCH_INTERVAL_SECONDS: float = 5.0
+    KAFKA_OUTBOX_ATTEMPTS_MAX: int = 5
+    KAFKA_OUTBOX_BATCH_LIMIT: int = 50
+    KAFKA_OUTBOX_DISPATCH_INTERVAL_SECONDS: float = 5.0
+
+    NOTIFICATION_OUTBOX_ATTEMPTS_MAX: int = 5
+    NOTIFICATION_OUTBOX_BATCH_LIMIT: int = 50
+    NOTIFICATION_OUTBOX_DISPATCH_INTERVAL_SECONDS: float = 5.0
 
     @field_validator('ORDER_SERVICE_CALLBACK_BASE_URL')
     @classmethod
@@ -70,6 +88,28 @@ class Settings(BaseSettings):
         return CapashinoSettings(
             base_url=self.CAPASHINO_BASE_URL,
             api_key=self.CAPASHINO_API_KEY,
+        )
+
+    @property
+    def kafka(self) -> KafkaSettings:
+        return KafkaSettings(
+            bootstrap_servers=self.KAFKA_BOOTSTRAP_SERVERS,
+            consumer_group_id=self.KAFKA_CONSUMER_GROUP_ID,
+            outbox_attempts_max=self.KAFKA_OUTBOX_ATTEMPTS_MAX,
+            outbox_batch_limit=self.KAFKA_OUTBOX_BATCH_LIMIT,
+            outbox_dispatch_interval_seconds=(
+                self.KAFKA_OUTBOX_DISPATCH_INTERVAL_SECONDS
+            ),
+        )
+
+    @property
+    def notifications(self) -> NotificationSettings:
+        return NotificationSettings(
+            outbox_attempts_max=self.NOTIFICATION_OUTBOX_ATTEMPTS_MAX,
+            outbox_batch_limit=self.NOTIFICATION_OUTBOX_BATCH_LIMIT,
+            outbox_dispatch_interval_seconds=(
+                self.NOTIFICATION_OUTBOX_DISPATCH_INTERVAL_SECONDS
+            ),
         )
 
 

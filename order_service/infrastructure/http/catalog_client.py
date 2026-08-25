@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import httpx
 
+from order_service.constants.exceptions import CatalogExceptionMessage
 from order_service.domain.entities import CatalogItem
 from order_service.domain.exceptions import CatalogServiceUnavailable
 
@@ -27,7 +28,9 @@ class HttpCatalogClient:
             response = await self._http.get(f'/api/catalog/items/{item_id}')
         except httpx.HTTPError as exception:
             raise CatalogServiceUnavailable(
-                f'Catalog Service недоступен: {exception}'
+                CatalogExceptionMessage.service_unreachable.format(
+                    exception=exception
+                )
             ) from exception
 
         if response.status_code == 404:
@@ -37,8 +40,10 @@ class HttpCatalogClient:
             response.raise_for_status()
         except httpx.HTTPStatusError as exception:
             raise CatalogServiceUnavailable(
-                f'Catalog Service вернул {response.status_code}: '
-                f'{response.text[:300]}'
+                CatalogExceptionMessage.service_rejected.format(
+                    status_code=response.status_code,
+                    body=response.text[:300],
+                )
             ) from exception
 
         data = response.json()

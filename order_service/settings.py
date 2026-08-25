@@ -1,5 +1,7 @@
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from order_service.settings_utils import normalize_base_url
 
 
 class DatabaseSettings(BaseModel):
@@ -41,7 +43,17 @@ class Settings(BaseSettings):
 
     ORDER_SERVICE_CALLBACK_BASE_URL: str
 
-    KAFKA_BOOTSTRAP_SERVERS: str = ''
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_CONSUMER_GROUP_ID: str = 'order-service'
+
+    OUTBOX_MAX_ATTEMPTS: int = 5
+    OUTBOX_BATCH_LIMIT: int = 50
+    OUTBOX_DISPATCH_INTERVAL_SECONDS: float = 5.0
+
+    @field_validator('ORDER_SERVICE_CALLBACK_BASE_URL')
+    @classmethod
+    def _ensure_scheme(cls, value: str) -> str:
+        return normalize_base_url(value)
 
     @property
     def database(self) -> DatabaseSettings:

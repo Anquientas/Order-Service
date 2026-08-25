@@ -51,9 +51,11 @@ class SqlAlchemyOrderRepository:
         row = await self._session.get(OrderModel, order_id)
         return _to_domain(row) if row else None
 
-    async def get_by_idempotency_key(self, key: str) -> Order | None:
+    async def get_by_idempotency_key(
+        self, idempotency_key: str
+    ) -> Order | None:
         statement = select(OrderModel).where(
-            OrderModel.idempotency_key == key
+            OrderModel.idempotency_key == idempotency_key
         )
         row = (await self._session.execute(statement)).scalar_one_or_none()
         return _to_domain(row) if row else None

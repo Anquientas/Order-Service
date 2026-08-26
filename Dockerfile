@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir uv \
 COPY alembic ./alembic
 COPY alembic.ini ./
 COPY bin ./bin
+RUN chmod +x bin/start.sh
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m alembic upgrade head && python bin/main.py"]
+CMD ["bash", "bin/start.sh"]

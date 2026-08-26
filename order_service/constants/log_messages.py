@@ -19,3 +19,9 @@ class NotificationDispatcherLogMessage(StrEnum):
         'Notification %s permanently failed after %s attempts: %s'
     )
     retry_attempt_failed = 'Notification %s send attempt %s failed: %s'
+
+
+class OutboxWorkerLogMessage(StrEnum):
+    started = 'Outbox worker started'
+    shutting_down = 'Shutting down outbox worker'
+    stopped = 'Outbox worker stopped'

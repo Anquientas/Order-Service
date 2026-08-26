@@ -48,6 +48,7 @@ class SqlAlchemyNotificationOutboxRepository:
             .where(NotificationOutboxModel.status == OutboxStatus.pending)
             .order_by(NotificationOutboxModel.created_at)
             .limit(limit)
+            .with_for_update(skip_locked=True)
         )
         rows = (await self._session.execute(statement)).scalars().all()
         return [_to_domain(row) for row in rows]
